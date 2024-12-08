@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from '@/hooks/use-toast';
-toast
+
+
 
 type LoginFormData = {
   email: string;
@@ -36,11 +36,7 @@ export default function LoginForm() {
         throw new Error('Login failed');
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Invalid email or password.",
-        variant: "destructive",
-      })
+      alert('Login failed');
     } finally {
       setIsLoading(false);
     }
