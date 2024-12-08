@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-
-
 type LoginFormData = {
   email: string;
   password: string;
@@ -15,9 +13,12 @@ type LoginFormData = {
 export default function LoginForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
+    setLoginError(null);
+
     try {
       const response = await fetch('/api/login', {
         method: 'POST',
@@ -27,16 +28,17 @@ export default function LoginForm() {
       
       if (response.ok) {
         const { token } = await response.json();
-        // Store the token in localStorage or a secure cookie
         localStorage.setItem('token', token);
         window.location.href = '/';
-    
-        
       } else {
-        throw new Error('Login failed');
+       
+        const errorData = await response.json().catch(() => ({}));
+        setLoginError(errorData.message || 'Login failed');
       }
     } catch (error) {
-      alert('Login failed');
+    
+      console.error('Login error:', error);
+      setLoginError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +51,7 @@ export default function LoginForm() {
         <Input
           id="email"
           type="email"
-          {...register('email', { 
+          {...register('email', {
             required: 'Email is required',
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -68,10 +70,10 @@ export default function LoginForm() {
         />
         {errors.password && <p className="text-red-500">{errors.password.message}</p>}
       </div>
+      {loginError && <p className="text-red-500">{loginError}</p>}
       <Button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Log In'}
       </Button>
     </form>
   );
 }
-

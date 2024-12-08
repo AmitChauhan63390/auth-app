@@ -39,11 +39,9 @@ export default function SignupForm() {
         throw new Error('Signup failed');
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem with your request.",
-        variant: "destructive",
-      })
+      console.error('Register error:', error);
+      
+      
     } finally {
       setIsLoading(false);
     }
